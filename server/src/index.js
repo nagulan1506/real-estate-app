@@ -73,6 +73,18 @@ async function seedDB() {
     phone: "+91-98989-89898",
     bio: "Specializing in luxury villas and OMR IT corridor apartments.",
   });
+  const a3 = await Agent.create({
+    name: "Ravi Shankar",
+    email: "ravi@example.com",
+    phone: "+91-90000-11111",
+    bio: "Focuses on emerging IT hubs like Porur and Vadapalani.",
+  });
+  const a4 = await Agent.create({
+    name: "Meera Nair",
+    email: "meera@example.com",
+    phone: "+91-99887-77665",
+    bio: "Expert in ECR beach houses and premium South Chennai localities.",
+  });
   await Property.create([
     {
       title: "Grand Villa in Anna Nagar",
@@ -139,6 +151,70 @@ async function seedDB() {
       ],
       description: "Traditional style independent house in a quiet, leafy neighborhood.",
       agentId: a1._id
+    },
+    {
+      title: "Seaside Villa in ECR",
+      type: "House",
+      location: "ECR, Chennai",
+      price: 45000000,
+      size: 3500,
+      rooms: 4,
+      lat: 12.8500,
+      lng: 80.2400,
+      images: [
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200",
+        "https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=1200"
+      ],
+      description: "Stunning beach house with direct sea access and private pool.",
+      agentId: a4._id
+    },
+    {
+      title: "Luxury Apartment in T. Nagar",
+      type: "Apartment",
+      location: "T. Nagar, Chennai",
+      price: 22000000,
+      size: 1800,
+      rooms: 3,
+      lat: 13.0418,
+      lng: 80.2341,
+      images: [
+        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1200"
+      ],
+      description: "Premium apartment in the shopping district, close to Panagal Park.",
+      agentId: a1._id
+    },
+    {
+      title: "Gated Community in Porur",
+      type: "Apartment",
+      location: "Porur, Chennai",
+      price: 7500000,
+      size: 1050,
+      rooms: 2,
+      lat: 13.0382,
+      lng: 80.1565,
+      images: [
+        "https://images.unsplash.com/photo-1484154218962-a1c002085d2f?q=80&w=1200",
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1200"
+      ],
+      description: "Affordable luxury in a secure gated community near DLF IT Park.",
+      agentId: a3._id
+    },
+    {
+      title: "Penthouse in Nungambakkam",
+      type: "Apartment",
+      location: "Nungambakkam, Chennai",
+      price: 55000000,
+      size: 3000,
+      rooms: 4,
+      lat: 13.0604,
+      lng: 80.2496,
+      images: [
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200",
+        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200"
+      ],
+      description: "Exclusive penthouse with panoramic city views and private terrace.",
+      agentId: a2._id
     }
   ]);
   console.log("Seeded Chennai agents and properties");
@@ -246,7 +322,93 @@ const properties = [
       "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?q=80&w=1200&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1599809275372-b7f55fc585b7?q=80&w=1200&auto=format&fit=crop"
     ],
-    description: "Cultural heart of the city, heritage home with modern interiors."
+    description: "Cultural heart of the city, heritage home with modern interiors.",
+    agentId: "a1"
+  },
+  {
+    id: "p7",
+    title: "Seaside Villa in ECR",
+    type: "House",
+    location: "ECR, Chennai",
+    price: 45000000,
+    size: 3500,
+    rooms: 4,
+    lat: 12.8500,
+    lng: 80.2400,
+    images: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200",
+      "https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=1200"
+    ],
+    description: "Stunning beach house with direct sea access and private pool.",
+    agentId: "a4"
+  },
+  {
+    id: "p8",
+    title: "Luxury Apartment in T. Nagar",
+    type: "Apartment",
+    location: "T. Nagar, Chennai",
+    price: 22000000,
+    size: 1800,
+    rooms: 3,
+    lat: 13.0418,
+    lng: 80.2341,
+    images: [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1200"
+    ],
+    description: "Premium apartment in the shopping district, close to Panagal Park.",
+    agentId: "a1"
+  },
+  {
+    id: "p9",
+    title: "Gated Community in Porur",
+    type: "Apartment",
+    location: "Porur, Chennai",
+    price: 7500000,
+    size: 1050,
+    rooms: 2,
+    lat: 13.0382,
+    lng: 80.1565,
+    images: [
+      "https://images.unsplash.com/photo-1484154218962-a1c002085d2f?q=80&w=1200",
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1200"
+    ],
+    description: "Affordable luxury in a secure gated community near DLF IT Park.",
+    agentId: "a3"
+  },
+  {
+    id: "p10",
+    title: "Compact Flat in Vadapalani",
+    type: "Apartment",
+    location: "Vadapalani, Chennai",
+    price: 6500000,
+    size: 900,
+    rooms: 2,
+    lat: 13.0500,
+    lng: 80.2120,
+    images: [
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?q=80&w=1200",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200"
+    ],
+    description: "Centrally located apartment near Forum Mall and Metro station.",
+    agentId: "a3"
+  },
+  {
+    id: "p11",
+    title: "Penthouse in Nungambakkam",
+    type: "Apartment",
+    location: "Nungambakkam, Chennai",
+    price: 55000000,
+    size: 3000,
+    rooms: 4,
+    lat: 13.0604,
+    lng: 80.2496,
+    images: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200"
+    ],
+    description: "Exclusive penthouse with panoramic city views and private terrace.",
+    agentId: "a2"
   }
 ];
 
@@ -257,7 +419,7 @@ const agents = [
     email: "suresh@example.com",
     phone: "+91-98765-43210",
     bio: "Expert in residential properties across Anna Nagar and T. Nagar.",
-    properties: ["p1", "p4", "p6"]
+    properties: ["p1", "p4", "p6", "p8"]
   },
   {
     id: "a2",
@@ -265,7 +427,23 @@ const agents = [
     email: "priya@example.com",
     phone: "+91-98989-89898",
     bio: "Specializing in luxury villas and OMR IT corridor apartments.",
-    properties: ["p2", "p3", "p5"]
+    properties: ["p2", "p3", "p5", "p11"]
+  },
+  {
+    id: "a3",
+    name: "Ravi Shankar",
+    email: "ravi@example.com",
+    phone: "+91-90000-11111",
+    bio: "Focuses on emerging IT hubs like Porur and Vadapalani.",
+    properties: ["p9", "p10"]
+  },
+  {
+    id: "a4",
+    name: "Meera Nair",
+    email: "meera@example.com",
+    phone: "+91-99887-77665",
+    bio: "Expert in ECR beach houses and premium South Chennai localities.",
+    properties: ["p7"]
   }
 ];
 
