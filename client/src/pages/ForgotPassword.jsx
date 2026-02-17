@@ -1,0 +1,44 @@
+import { useState } from "react";
+import api from "../lib/api.js";
+
+export default function ForgotPassword() {
+    const [email, setEmail] = useState("");
+    const [message, setMessage] = useState(null);
+    const [error, setError] = useState(null);
+
+    const submit = async (e) => {
+        e.preventDefault();
+        setError(null);
+        setMessage(null);
+        try {
+            const res = await api.post("/auth/forgot-password", { email });
+            setMessage(res.data.message);
+        } catch (err) {
+            setError(err.response?.data?.message || "Something went wrong");
+        }
+    };
+
+    return (
+        <div className="max-w-md mx-auto mt-10">
+            <h1 className="text-2xl font-bold mb-4 text-white">Forgot Password</h1>
+            <form onSubmit={submit} className="space-y-4">
+                <div>
+                    <label className="block text-gray-400 mb-1">Email Address</label>
+                    <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email"
+                        type="email"
+                        className="w-full px-3 py-2 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:border-blue-500 placeholder-gray-500"
+                        required
+                    />
+                </div>
+                <button className="w-full px-4 py-2 bg-[#87CEEB] text-gray-900 font-bold rounded hover:bg-[#76c2e3] transition">
+                    Send Reset Link
+                </button>
+                {message && <div className="text-green-400 p-2 bg-green-900/20 rounded border border-green-800">{message}</div>}
+                {error && <div className="text-red-400 p-2 bg-red-900/20 rounded border border-red-800">{error}</div>}
+            </form>
+        </div>
+    );
+}
