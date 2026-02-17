@@ -15,6 +15,7 @@ import Compare from "./pages/Compare.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import AIChatBubble from "./components/AIChatBubble.jsx";
+import Debug from "./components/Debug.jsx";
 import logo from "./assets/logo.svg";
 
 function Layout({ children }) {
@@ -240,16 +241,19 @@ function CompareWrapper() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<ListingsPage />} />
-      <Route path="/property/:id" element={<PropertyDetailPage />} />
-      <Route path="/agents" element={<AgentsPage />} />
-      <Route path="/login" element={<Layout><Login /></Layout>} />
-      <Route path="/register" element={<Layout><Register /></Layout>} />
-      <Route path="/forgot-password" element={<Layout><ForgotPassword /></Layout>} />
-      <Route path="/reset-password/:token" element={<Layout><ResetPassword /></Layout>} />
-      <Route path="/agent" element={<Layout><AgentDB /></Layout>} />
-      <Route path="/compare" element={<Layout><CompareWrapper /></Layout>} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<ListingsPage />} />
+        <Route path="/property/:id" element={<PropertyDetailPage />} />
+        <Route path="/agents" element={<AgentsPage />} />
+        <Route path="/login" element={<Layout><Login /></Layout>} />
+        <Route path="/register" element={<Layout><Register /></Layout>} />
+        <Route path="/forgot-password" element={<Layout><ForgotPassword /></Layout>} />
+        <Route path="/reset-password/:token" element={<Layout><ResetPassword /></Layout>} />
+        <Route path="/agent" element={<Layout><AgentDB /></Layout>} />
+        <Route path="/compare" element={<Layout><CompareWrapper /></Layout>} />
+      </Routes>
+      <Debug />
+    </>
   );
 }
