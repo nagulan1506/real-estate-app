@@ -4,7 +4,7 @@ import api from "../lib/api";
 export default function AIChatBubble() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
-        { role: "system", content: "Hi! I'm your AI assistant. Ask me about properties, locations, or prices." }
+        { role: "system", content: "Hi! I'm Gemini, your real estate assistant. Ask me about properties, locations, or market trends!" }
     ]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -43,8 +43,8 @@ export default function AIChatBubble() {
                     {/* Header */}
                     <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex justify-between items-center text-white">
                         <div className="flex items-center gap-2">
-                            <span className="text-xl">🤖</span>
-                            <span className="font-semibold">Live Assistant</span>
+                            <span className="text-xl">✨</span>
+                            <span className="font-semibold">Gemini AI Assistant</span>
                         </div>
                         <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 rounded-full p-1">
                             ✕
@@ -57,8 +57,8 @@ export default function AIChatBubble() {
                             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                                 <div
                                     className={`max-w-[80%] p-3 rounded-lg text-sm ${m.role === "user"
-                                            ? "bg-blue-600 text-white rounded-br-none"
-                                            : "bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm"
+                                        ? "bg-blue-600 text-white rounded-br-none"
+                                        : "bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm"
                                         }`}
                                 >
                                     {m.content}

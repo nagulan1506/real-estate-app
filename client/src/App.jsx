@@ -254,6 +254,7 @@ export default function App() {
         <Route path="/compare" element={<Layout><CompareWrapper /></Layout>} />
       </Routes>
       <Debug />
+      <AIChatBubble />
     </>
   );
 }

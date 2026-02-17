@@ -58,34 +58,48 @@ await connectDB();
 
 async function seedDB() {
   if (!dbConnected) return;
-  const propCount = await Property.countDocuments();
-  const agentCount = await Agent.countDocuments();
-  if (propCount > 0 || agentCount > 0) return;
-  const a1 = await Agent.create({
-    name: "Suresh Kumar",
-    email: "suresh@example.com",
-    phone: "+91-98765-43210",
-    bio: "Expert in residential properties across Anna Nagar and T. Nagar.",
-  });
-  const a2 = await Agent.create({
-    name: "Priya Rajan",
-    email: "priya@example.com",
-    phone: "+91-98989-89898",
-    bio: "Specializing in luxury villas and OMR IT corridor apartments.",
-  });
-  const a3 = await Agent.create({
-    name: "Ravi Shankar",
-    email: "ravi@example.com",
-    phone: "+91-90000-11111",
-    bio: "Focuses on emerging IT hubs like Porur and Vadapalani.",
-  });
-  const a4 = await Agent.create({
-    name: "Meera Nair",
-    email: "meera@example.com",
-    phone: "+91-99887-77665",
-    bio: "Expert in ECR beach houses and premium South Chennai localities.",
-  });
-  await Property.create([
+  // Check if specific agents exist to avoid duplicates or missing new ones
+  let a1 = await Agent.findOne({ email: "suresh@example.com" });
+  if (!a1) {
+    a1 = await Agent.create({
+      name: "Suresh Kumar",
+      email: "suresh@example.com",
+      phone: "+91-98765-43210",
+      bio: "Expert in residential properties across Anna Nagar and T. Nagar.",
+    });
+  }
+
+  let a2 = await Agent.findOne({ email: "priya@example.com" });
+  if (!a2) {
+    a2 = await Agent.create({
+      name: "Priya Rajan",
+      email: "priya@example.com",
+      phone: "+91-98989-89898",
+      bio: "Specializing in luxury villas and OMR IT corridor apartments.",
+    });
+  }
+
+  let a3 = await Agent.findOne({ email: "ravi@example.com" });
+  if (!a3) {
+    a3 = await Agent.create({
+      name: "Ravi Shankar",
+      email: "ravi@example.com",
+      phone: "+91-90000-11111",
+      bio: "Focuses on emerging IT hubs like Porur and Vadapalani.",
+    });
+  }
+
+  let a4 = await Agent.findOne({ email: "meera@example.com" });
+  if (!a4) {
+    a4 = await Agent.create({
+      name: "Meera Nair",
+      email: "meera@example.com",
+      phone: "+91-99887-77665",
+      bio: "Expert in ECR beach houses and premium South Chennai localities.",
+    });
+  }
+  // Upsert properties based on title to avoid duplicates
+  const props = [
     {
       title: "Grand Villa in Anna Nagar",
       type: "House",
@@ -113,11 +127,11 @@ async function seedDB() {
       lat: 12.8996,
       lng: 80.2209,
       images: [
-        "https://images.unsplash.com/photo-1628624747186-a941c476b7ef?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1600596542815-2251330d666e?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1613545325278-f24b0cae1224?q=80&w=1200&auto=format&fit=crop"
+        "https://images.unsplash.com/photo-1628624747186-a941c476b7ef?q=80&w=1200",
+        "https://images.unsplash.com/photo-1600596542815-2251330d666e?q=80&w=1200",
+        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200",
+        "https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=1200",
+        "https://images.unsplash.com/photo-1613545325278-f24b0cae1224?q=80&w=1200"
       ],
       description: "Modern villa located near the IT corridor with excellent connectivity.",
       agentId: a2._id
@@ -216,7 +230,14 @@ async function seedDB() {
       description: "Exclusive penthouse with panoramic city views and private terrace.",
       agentId: a2._id
     }
-  ]);
+  ];
+
+  for (const p of props) {
+    const exists = await Property.findOne({ title: p.title });
+    if (!exists) {
+      await Property.create(p);
+    }
+  }
   console.log("Seeded Chennai agents and properties");
 }
 
