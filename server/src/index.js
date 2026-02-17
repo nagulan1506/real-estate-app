@@ -23,6 +23,10 @@ app.use(cors({ origin: ["http://localhost:5173", process.env.FRONTEND_URL || "*"
 app.use(express.json());
 app.use(morgan("dev"));
 
+app.get("/", (req, res) => {
+  res.send("Real Estate API is running");
+});
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
