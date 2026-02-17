@@ -76,7 +76,12 @@ function ListingsPage() {
   }, [filters]);
 
   useEffect(() => {
-    api.get(`/properties${query}`).then((res) => setProperties(res.data));
+    api.get(`/properties${query}`)
+      .then((res) => setProperties(res.data))
+      .catch(err => {
+        console.error(err);
+        alert("Failed to load listings: " + (err.response?.data?.message || err.message));
+      });
   }, [query]);
 
   return (
@@ -200,7 +205,12 @@ function PropertyDetailPage() {
 function AgentsPage() {
   const [agents, setAgents] = useState([]);
   useEffect(() => {
-    api.get("/agents").then((res) => setAgents(res.data));
+    api.get("/agents")
+      .then((res) => setAgents(res.data))
+      .catch(err => {
+        console.error(err);
+        alert("Failed to load agents: " + (err.response?.data?.message || err.message));
+      });
   }, []);
   return (
     <Layout>

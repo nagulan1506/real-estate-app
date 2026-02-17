@@ -19,7 +19,7 @@ import Razorpay from "razorpay";
 dotenv.config();
 
 const app = express();
-app.use(cors({ origin: ["http://localhost:5173", process.env.FRONTEND_URL || "*"] }));
+app.use(cors()); // Allow all origins for debugging
 app.use(express.json());
 app.use(morgan("dev"));
 

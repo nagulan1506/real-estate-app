@@ -15,6 +15,10 @@
       document.body.innerHTML += '<div style="color:red; padding:20px; z-index:9999; position:fixed; background:white;">Error: ' + msg + '</div>';
       return false;
     };
+    window.onunhandledrejection = function (event) {
+      console.error('Unhandled rejection:', event.reason);
+      document.body.innerHTML += '<div style="color:red; padding:20px; z-index:9999; position:fixed; background:white;">Async Error: ' + event.reason + '</div>';
+    };
     console.log("Details:", {
       base: import.meta.env?.BASE_URL,
       mode: import.meta.env?.MODE,
