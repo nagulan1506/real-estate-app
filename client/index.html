@@ -19,11 +19,6 @@
       console.error('Unhandled rejection:', event.reason);
       document.body.innerHTML += '<div style="color:red; padding:20px; z-index:9999; position:fixed; background:white;">Async Error: ' + event.reason + '</div>';
     };
-    console.log("Details:", {
-      base: import.meta.env?.BASE_URL,
-      mode: import.meta.env?.MODE,
-      prod: import.meta.env?.PROD
-    });
   </script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script type="module" src="/src/main.jsx"></script>
