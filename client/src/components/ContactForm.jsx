@@ -20,7 +20,7 @@ export default function ContactForm({ property, onDone }) {
 
   return (
     <form onSubmit={submit} className="space-y-2">
-      <div className="font-semibold text-gray-900">Contact about: {property.title}</div>
+      <div className="font-semibold text-white">Contact about: {property.title}</div>
       <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="w-full px-3 py-2 border rounded text-gray-900 bg-white" />
       <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" type="email" className="w-full px-3 py-2 border rounded text-gray-900 bg-white" />
       <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Message" className="w-full px-3 py-2 border rounded text-gray-900 bg-white" />

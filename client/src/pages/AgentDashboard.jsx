@@ -40,10 +40,10 @@ export default function AgentDashboard() {
   return (
     <div>
       {!user || user.role !== "agent" ? (
-        <div className="p-4 border rounded bg-white mb-4">Please login as an agent to manage properties.</div>
+        <div className="p-4 border rounded bg-white text-gray-900 mb-4">Please login as an agent to manage properties.</div>
       ) : null}
       <h1 className="text-2xl font-bold mb-4">Agent Dashboard</h1>
-      <form onSubmit={create} className="grid md:grid-cols-3 gap-2 p-4 border rounded bg-white">
+      <form onSubmit={create} className="grid md:grid-cols-3 gap-2 p-4 border rounded bg-white text-gray-900">
         <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Title" className="px-3 py-2 border rounded text-gray-900 bg-white" />
         <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="px-3 py-2 border rounded text-gray-900 bg-white">
           <option>Apartment</option><option>House</option><option>Condo</option><option>Villa</option><option>Studio</option>
@@ -61,7 +61,7 @@ export default function AgentDashboard() {
 
       <div className="grid md:grid-cols-3 gap-4 mt-6">
         {properties.map((p) => (
-          <div key={p._id || p.id} className="bg-white rounded shadow p-3">
+          <div key={p._id || p.id} className="bg-white rounded shadow p-3 text-gray-900">
             <div className="font-semibold">{p.title}</div>
             <div className="text-sm text-gray-600">{p.type} • {p.location}</div>
             <div className="text-sm">${p.price}</div>
