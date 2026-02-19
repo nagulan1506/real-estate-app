@@ -70,6 +70,10 @@ function ListingsPage() {
   const [properties, setProperties] = useState([]);
   const [contactFor, setContactFor] = useState(null);
   const [compare, setCompare] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  const [showCalc, setShowCalc] = useState(false);
+  const [calc, setCalc] = useState({ rent: "", price: "", appreciation: "5", years: "10" });
+  const [savedApplied, setSavedApplied] = useState(false);
 
   const query = useMemo(() => {
     const params = new URLSearchParams(filters);
@@ -79,7 +83,11 @@ function ListingsPage() {
 
   useEffect(() => {
     api.get(`/properties${query}`)
-      .then((res) => setProperties(res.data))
+      .then((res) => setProperties(
+        (Array.isArray(res.data) ? res.data : []).filter(
+          (p) => Array.isArray(p.images) && p.images.length > 0 && typeof p.images[0] === "string" && p.images[0].trim().length > 0
+        )
+      ))
       .catch(err => {
         console.error(err);
         alert("Failed to load listings: " + (err.response?.data?.message || err.message));
@@ -94,6 +102,17 @@ function ListingsPage() {
         if (Array.isArray(parsed)) setCompare(parsed);
       } catch {}
     }
+    try {
+      const fav = JSON.parse(localStorage.getItem("favorites") || "[]");
+      if (Array.isArray(fav)) setFavorites(fav);
+    } catch {}
+    try {
+      const saved = JSON.parse(localStorage.getItem("saved_search") || "{}");
+      if (saved && Object.keys(saved).length) {
+        setFilters(saved);
+        setSavedApplied(true);
+      }
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -102,14 +121,44 @@ function ListingsPage() {
     } catch {}
   }, [compare]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+    } catch {}
+  }, [favorites]);
+
+  const toggleFavorite = (p) => {
+    setFavorites((prev) => {
+      const id = p._id || p.id;
+      const exists = prev.some((x) => (x._id || x.id) === id);
+      if (exists) return prev.filter((x) => (x._id || x.id) !== id);
+      return [...prev, p];
+    });
+  };
+
   return (
     <Layout>
       <div className="space-y-4">
-        <Filters onChange={setFilters} />
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <Filters onChange={setFilters} />
+          </div>
+        </div>
+        {savedApplied && (
+          <div className="p-2 bg-emerald-900/20 text-emerald-300 rounded border border-emerald-800">
+            Saved search applied. <button className="underline" onClick={() => { setFilters({}); localStorage.removeItem("saved_search"); setSavedApplied(false); }}>Clear</button>
+          </div>
+        )}
         <MapView properties={properties} />
         <div className="flex justify-between items-center">
-          <div className="text-sm text-gray-600">Selected for comparison: {compare.length}</div>
-          <Link to="/compare" state={{ list: compare }} className="px-3 py-2 bg-gray-100 rounded">Open Comparison</Link>
+          <div className="text-sm text-gray-400 flex gap-4 items-center">
+            <span>Compare: {compare.length}</span>
+            <a href="/favorites" className="px-3 py-1 bg-gray-800 border border-gray-700 rounded text-white">Favorites: {favorites.length}</a>
+          </div>
+          <div className="flex gap-2">
+            <Link to="/compare" state={{ list: compare }} className="px-3 py-2 bg-gray-100 rounded">Open Comparison</Link>
+            <button onClick={() => setShowCalc(true)} className="px-3 py-2 bg-blue-600 text-white rounded">Rent vs Buy</button>
+          </div>
         </div>
         <div className="grid md:grid-cols-3 gap-4">
           {properties.map((p) => (
@@ -129,7 +178,12 @@ function ListingsPage() {
                 />
                 <span className="text-sm">Compare</span>
               </label>
-              <PropertyCard property={p} onContact={setContactFor} />
+              <PropertyCard
+                property={p}
+                onContact={setContactFor}
+                isFavorite={favorites.some((x) => (x._id || x.id) === (p._id || p.id))}
+                onToggleFavorite={toggleFavorite}
+              />
             </div>
           ))}
         </div>
@@ -149,6 +203,34 @@ function ListingsPage() {
               <ContactForm property={contactFor} onDone={() => setContactFor(null)} />
             </div>
           )}
+        </Modal>
+        <Modal isOpen={showCalc} onClose={() => setShowCalc(false)} title="Rent vs Buy Calculator" size="lg">
+          <div className="grid grid-cols-2 gap-3">
+            <input value={calc.rent} onChange={(e) => setCalc({ ...calc, rent: e.target.value })} placeholder="Monthly rent (₹)" type="number" className="px-3 py-2 border rounded text-gray-900 bg-white" />
+            <input value={calc.price} onChange={(e) => setCalc({ ...calc, price: e.target.value })} placeholder="Property price (₹)" type="number" className="px-3 py-2 border rounded text-gray-900 bg-white" />
+            <input value={calc.appreciation} onChange={(e) => setCalc({ ...calc, appreciation: e.target.value })} placeholder="Appreciation % per year" type="number" className="px-3 py-2 border rounded text-gray-900 bg-white" />
+            <input value={calc.years} onChange={(e) => setCalc({ ...calc, years: e.target.value })} placeholder="Years" type="number" className="px-3 py-2 border rounded text-gray-900 bg-white" />
+          </div>
+          <div className="mt-4 p-3 bg-gray-800 rounded border border-gray-700 text-sm">
+            {(() => {
+              const rent = Number(calc.rent) || 0;
+              const price = Number(calc.price) || 0;
+              const appr = (Number(calc.appreciation) || 0) / 100;
+              const years = Number(calc.years) || 0;
+              const totalRent = rent * 12 * years;
+              const futureValue = price * Math.pow(1 + appr, years);
+              const summary = price ? `Buy: current ₹${price.toLocaleString("en-IN")} → projected ₹${Math.round(futureValue).toLocaleString("en-IN")} in ${years} years` : "Enter price";
+              const rentSummary = `Rent: total spend ₹${Math.round(totalRent).toLocaleString("en-IN")} over ${years} years`;
+              const suggestion = price && futureValue > price + totalRent ? "Buying may be better long-term." : "Renting may be more economical currently.";
+              return (
+                <>
+                  <div>{summary}</div>
+                  <div>{rentSummary}</div>
+                  <div className="mt-2 font-semibold text-emerald-400">{suggestion}</div>
+                </>
+              );
+            })()}
+          </div>
         </Modal>
       </div>
     </Layout>
@@ -292,6 +374,9 @@ function PropertyDetailPage() {
 
 function AgentsPage() {
   const [agents, setAgents] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [handled, setHandled] = useState([]);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     api.get("/agents")
       .then((res) => setAgents(res.data))
@@ -300,6 +385,21 @@ function AgentsPage() {
         alert("Failed to load agents: " + (err.response?.data?.message || err.message));
       });
   }, []);
+  const openHandled = async (agent) => {
+    setSelected(agent);
+    setLoading(true);
+    setHandled([]);
+    try {
+      const res = await api.get(`/agents/${agent._id || agent.id}`);
+      const list = Array.isArray(res.data.handledProperties) ? res.data.handledProperties : [];
+      const imgOk = (p) => Array.isArray(p.images) && p.images.length > 0 && typeof p.images[0] === "string" && p.images[0].trim().length > 0;
+      setHandled(list.filter(imgOk));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Layout>
       <div className="grid md:grid-cols-3 gap-6">
@@ -308,15 +408,39 @@ function AgentsPage() {
             <div className="font-bold text-xl text-white">{a.name}</div>
             <div className="text-sm text-gray-400 mt-1">{a.email} • {a.phone}</div>
             <p className="mt-4 text-sm text-gray-300">{a.bio}</p>
-            <div className="mt-3">
-              <div className="text-sm font-medium text-gray-500">Handling:</div>
-              <ul className="text-sm list-disc list-inside text-emerald-400">
-                {a.properties?.map((pid) => <li key={pid}><Link to={`/property/${pid}`} className="hover:underline">{pid}</Link></li>)}
-              </ul>
+            <div className="mt-4 flex gap-2">
+              <button onClick={() => openHandled(a)} className="px-3 py-2 bg-blue-600 text-white rounded">View Handled</button>
+              <a href="/agent" className="px-3 py-2 border border-gray-700 text-gray-300 rounded">Agent Dashboard</a>
             </div>
           </div>
         ))}
       </div>
+      <Modal isOpen={!!selected} onClose={() => { setSelected(null); setHandled([]); }} title={selected ? `Handled by ${selected.name}` : "Handled Properties"} size="lg">
+        {loading ? (
+          <div className="text-gray-400">Loading...</div>
+        ) : handled.length === 0 ? (
+          <div className="text-gray-400">No handled properties found.</div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-4">
+            {handled.map((p) => (
+              <div key={p._id || p.id} className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+                <img src={p.images?.[0]} alt={p.title} className="h-32 w-full object-cover" />
+                <div className="p-3">
+                  <div className="font-semibold text-white">{p.title}</div>
+                  <div className="text-sm text-gray-400">{p.type} • {p.location}</div>
+                  <div className="font-bold text-emerald-400">
+                    {p.price?.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
+                  </div>
+                  <div className="mt-2 flex gap-2">
+                    <a href={`/property/${p._id || p.id}`} className="px-3 py-1 border border-gray-700 rounded text-gray-300">View</a>
+                    <Link to="/compare" state={{ list: [p] }} className="px-3 py-1 bg-gray-800 rounded text-white border border-gray-700">Compare</Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Modal>
     </Layout>
   );
 }
@@ -330,7 +454,49 @@ function CompareWrapper() {
       if (Array.isArray(stored)) list = stored;
     } catch {}
   }
-  return <Compare list={list} />;
+  const imgOk = (p) => Array.isArray(p.images) && p.images.length > 0 && typeof p.images[0] === "string" && p.images[0].trim().length > 0;
+  return <Compare list={list.filter(imgOk)} />;
+}
+
+function FavoritesPage() {
+  const [list, setList] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("favorites") || "[]"); } catch { return []; }
+  });
+  const remove = (id) => {
+    const next = list.filter((p) => (p._id || p.id) !== id);
+    setList(next);
+    localStorage.setItem("favorites", JSON.stringify(next));
+  };
+  return (
+    <Layout>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold text-white">Favorites</h1>
+        <Link to="/compare" state={{ list }} className="px-3 py-2 bg-gray-100 rounded">Compare Favorites</Link>
+      </div>
+      {list.length === 0 ? (
+        <div className="text-gray-400">No favorites yet. Add some from listings.</div>
+      ) : (
+        <div className="grid md:grid-cols-3 gap-4">
+          {list.map((p) => (
+            <div key={p._id || p.id} className="bg-gray-900 border border-gray-800 rounded-xl shadow-lg overflow-hidden">
+              <img src={p.images?.[0]} alt={p.title} className="h-40 w-full object-cover" />
+              <div className="p-4">
+                <div className="font-bold text-white">{p.title}</div>
+                <div className="text-sm text-gray-400">{p.type} • {p.location}</div>
+                <div className="font-bold text-emerald-400">
+                  {p.price?.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <a href={`/property/${p._id || p.id}`} className="px-3 py-2 border border-gray-700 rounded text-gray-300">View</a>
+                  <button onClick={() => remove(p._id || p.id)} className="px-3 py-2 bg-red-600 text-white rounded">Remove</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Layout>
+  );
 }
 
 export default function App() {
@@ -340,6 +506,7 @@ export default function App() {
         <Route path="/" element={<ListingsPage />} />
         <Route path="/property/:id" element={<PropertyDetailPage />} />
         <Route path="/agents" element={<AgentsPage />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/login" element={<Layout><Login /></Layout>} />
         <Route path="/register" element={<Layout><Register /></Layout>} />
         <Route path="/forgot-password" element={<Layout><ForgotPassword /></Layout>} />

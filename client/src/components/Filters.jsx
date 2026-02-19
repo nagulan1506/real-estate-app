@@ -6,6 +6,7 @@ export default function Filters({ onChange }) {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [rooms, setRooms] = useState("");
+  const [savedMsg, setSavedMsg] = useState(null);
 
   const apply = () => {
     onChange({
@@ -20,6 +21,18 @@ export default function Filters({ onChange }) {
   const reset = () => {
     setLocation(""); setType(""); setMinPrice(""); setMaxPrice(""); setRooms("");
     onChange({});
+  };
+  const save = () => {
+    const payload = {
+      location: location || undefined,
+      type: type || undefined,
+      minPrice: minPrice || undefined,
+      maxPrice: maxPrice || undefined,
+      rooms: rooms || undefined,
+    };
+    localStorage.setItem("saved_search", JSON.stringify(payload));
+    setSavedMsg("Saved!");
+    setTimeout(() => setSavedMsg(null), 1200);
   };
 
   return (
@@ -36,6 +49,8 @@ export default function Filters({ onChange }) {
       <div className="col-span-full flex gap-3 mt-2">
         <button onClick={apply} className="flex-1 py-2 bg-primary-gradient text-white font-semibold rounded-lg shadow hover:shadow-lg transition border border-transparent">Apply Filters</button>
         <button onClick={reset} className="px-6 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800 transition">Reset</button>
+        <button onClick={save} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition">Save Search</button>
+        {savedMsg && <span className="text-emerald-400 text-sm self-center">{savedMsg}</span>}
       </div>
     </div>
   );
