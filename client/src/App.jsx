@@ -17,6 +17,7 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 import AIChatBubble from "./components/AIChatBubble.jsx";
 import Debug from "./components/Debug.jsx";
 import logo from "./assets/logo.svg";
+import Modal from "./components/Modal.jsx";
 
 function Layout({ children }) {
   return (
@@ -85,6 +86,22 @@ function ListingsPage() {
       });
   }, [query]);
 
+  useEffect(() => {
+    const stored = localStorage.getItem("compare_list");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) setCompare(parsed);
+      } catch {}
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("compare_list", JSON.stringify(compare));
+    } catch {}
+  }, [compare]);
+
   return (
     <Layout>
       <div className="space-y-4">
@@ -116,14 +133,23 @@ function ListingsPage() {
             </div>
           ))}
         </div>
-        {contactFor && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-            <div className="bg-white p-4 rounded w-full max-w-md">
-              <button className="float-right" onClick={() => setContactFor(null)}>✕</button>
+        <Modal isOpen={!!contactFor} onClose={() => setContactFor(null)} title={contactFor ? contactFor.title : "Contact"}>
+          {contactFor && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <img src={contactFor.images?.[0]} alt={contactFor.title} className="h-16 w-24 object-cover rounded-lg border border-gray-800" />
+                <div>
+                  <div className="font-semibold">{contactFor.title}</div>
+                  <div className="text-sm text-gray-400">{contactFor.type} • {contactFor.location}</div>
+                  <div className="font-bold text-emerald-400">
+                    {contactFor.price?.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
+                  </div>
+                </div>
+              </div>
               <ContactForm property={contactFor} onDone={() => setContactFor(null)} />
             </div>
-          </div>
-        )}
+          )}
+        </Modal>
       </div>
     </Layout>
   );
@@ -134,6 +160,9 @@ function PropertyDetailPage() {
   const [property, setProperty] = useState(null);
   const [agent, setAgent] = useState(null);
   const [insights, setInsights] = useState(null);
+  const [showAppt, setShowAppt] = useState(false);
+  const [showContact, setShowContact] = useState(false);
+  const [showBook, setShowBook] = useState(false);
 
   useEffect(() => {
     api.get(`/properties/${id}`).then((res) => {
@@ -194,9 +223,67 @@ function PropertyDetailPage() {
               <div className="text-sm text-gray-400 mt-1">{agent.email} • {agent.phone}</div>
             </div>
           )}
-          {agent && <AppointmentForm property={property} agent={agent} />}
-          <ContactForm property={property} />
-          <BookProperty property={property} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {agent && (
+              <button
+                onClick={() => setShowAppt(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Schedule Viewing
+              </button>
+            )}
+            <button
+              onClick={() => setShowContact(true)}
+              className="px-4 py-2 bg-gray-700 text-white rounded"
+            >
+              Contact Agent
+            </button>
+            <button
+              onClick={() => setShowBook(true)}
+              className="px-4 py-2 bg-emerald-600 text-white rounded md:col-span-2"
+            >
+              Book Property
+            </button>
+          </div>
+          <Modal isOpen={showAppt} onClose={() => setShowAppt(false)} title="Schedule Viewing" size="lg">
+            <div className="flex items-center gap-4 mb-4">
+              <img src={property.images?.[0]} alt={property.title} className="h-16 w-24 object-cover rounded-lg border border-gray-800" />
+              <div>
+                <div className="font-semibold">{property.title}</div>
+                <div className="text-sm text-gray-400">{property.type} • {property.location}</div>
+                <div className="font-bold text-emerald-400">
+                  {property.price?.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
+                </div>
+              </div>
+            </div>
+            {agent && <AppointmentForm property={property} agent={agent} onDone={() => setShowAppt(false)} />}
+          </Modal>
+          <Modal isOpen={showContact} onClose={() => setShowContact(false)} title="Contact Agent" size="lg">
+            <div className="flex items-center gap-4 mb-4">
+              <img src={property.images?.[0]} alt={property.title} className="h-16 w-24 object-cover rounded-lg border border-gray-800" />
+              <div>
+                <div className="font-semibold">{property.title}</div>
+                <div className="text-sm text-gray-400">{property.type} • {property.location}</div>
+                <div className="font-bold text-emerald-400">
+                  {property.price?.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
+                </div>
+              </div>
+            </div>
+            <ContactForm property={property} onDone={() => setShowContact(false)} />
+          </Modal>
+          <Modal isOpen={showBook} onClose={() => setShowBook(false)} title="Book Property" size="lg">
+            <div className="flex items-center gap-4 mb-4">
+              <img src={property.images?.[0]} alt={property.title} className="h-16 w-24 object-cover rounded-lg border border-gray-800" />
+              <div>
+                <div className="font-semibold">{property.title}</div>
+                <div className="text-sm text-gray-400">{property.type} • {property.location}</div>
+                <div className="font-bold text-emerald-400">
+                  {property.price?.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 })}
+                </div>
+              </div>
+            </div>
+            <BookProperty property={property} />
+          </Modal>
         </div>
       </div>
     </Layout>
@@ -236,7 +323,14 @@ function AgentsPage() {
 
 function CompareWrapper() {
   const { state } = useLocation();
-  return <Compare list={state?.list || []} />;
+  let list = state?.list || [];
+  if (!list.length) {
+    try {
+      const stored = JSON.parse(localStorage.getItem("compare_list") || "[]");
+      if (Array.isArray(stored)) list = stored;
+    } catch {}
+  }
+  return <Compare list={list} />;
 }
 
 export default function App() {
