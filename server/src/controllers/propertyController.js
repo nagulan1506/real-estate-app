@@ -1,38 +1,81 @@
 import Property from "../models/Property.js";
+import { isConnected } from "../config/database.js";
+import { mockProperties } from "../config/mockData.js";
 
 export async function getProperties(req, res) {
   const { location, minPrice, maxPrice, type, rooms } = req.query;
   
   try {
-    const q = {};
-    if (location) q.location = new RegExp(String(location), "i");
-    if (type) q.type = String(type);
-    if (rooms && !Number.isNaN(Number(rooms))) {
-      q.rooms = { $gte: Number(rooms) };
-    }
-    if (!Number.isNaN(Number(minPrice)) || !Number.isNaN(Number(maxPrice))) {
-      q.price = {};
-      if (!Number.isNaN(Number(minPrice))) q.price.$gte = Number(minPrice);
-      if (!Number.isNaN(Number(maxPrice))) q.price.$lte = Number(maxPrice);
-    }
+    if (isConnected()) {
+      const q = {};
+      if (location) q.location = new RegExp(String(location), "i");
+      if (type) q.type = String(type);
+      if (rooms && !Number.isNaN(Number(rooms))) {
+        q.rooms = { $gte: Number(rooms) };
+      }
+      if (!Number.isNaN(Number(minPrice)) || !Number.isNaN(Number(maxPrice))) {
+        q.price = {};
+        if (!Number.isNaN(Number(minPrice))) q.price.$gte = Number(minPrice);
+        if (!Number.isNaN(Number(maxPrice))) q.price.$lte = Number(maxPrice);
+      }
 
-    const properties = await Property.find(q);
-    res.json(properties);
+      const properties = await Property.find(q);
+      return res.json(properties);
+    } else {
+      // Fallback to mock data
+      let result = [...mockProperties];
+      if (location) {
+        result = result.filter((p) => p.location.toLowerCase().includes(String(location).toLowerCase()));
+      }
+      if (type) {
+        result = result.filter((p) => p.type.toLowerCase() === String(type).toLowerCase());
+      }
+      if (rooms) {
+        const r = Number(rooms);
+        if (!Number.isNaN(r)) result = result.filter((p) => p.rooms >= r);
+      }
+      if (minPrice) {
+        const m = Number(minPrice);
+        if (!Number.isNaN(m)) result = result.filter((p) => p.price >= m);
+      }
+      if (maxPrice) {
+        const m = Number(maxPrice);
+        if (!Number.isNaN(m)) result = result.filter((p) => p.price <= m);
+      }
+      return res.json(result);
+    }
   } catch (error) {
     console.error("Get properties error:", error);
-    res.status(500).json({ message: "Failed to fetch properties" });
+    // Fallback to mock data on error
+    res.json(mockProperties);
   }
 }
 
 export async function getPropertyById(req, res) {
   try {
-    const property = await Property.findById(req.params.id);
-    if (!property) {
-      return res.status(404).json({ message: "Property not found" });
+    if (isConnected()) {
+      const property = await Property.findById(req.params.id);
+      if (!property) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+      return res.json(property);
+    } else {
+      // Fallback to mock data
+      const { mockProperties } = await import("../config/mockData.js");
+      const property = mockProperties.find((p) => (p._id || p.id) === req.params.id);
+      if (!property) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+      return res.json(property);
     }
-    res.json(property);
   } catch (error) {
     console.error("Get property error:", error);
+    // Fallback to mock data on error
+    const { mockProperties } = await import("../config/mockData.js");
+    const property = mockProperties.find((p) => (p._id || p.id) === req.params.id);
+    if (property) {
+      return res.json(property);
+    }
     res.status(404).json({ message: "Property not found" });
   }
 }

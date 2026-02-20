@@ -45,8 +45,16 @@ export async function chat(req, res) {
   }
 
   // Get properties for context
-  const Property = (await import("../models/Property.js")).default;
-  const properties = await Property.find().limit(20);
+  const { isConnected } = await import("../config/database.js");
+  let properties = [];
+  
+  if (isConnected()) {
+    const Property = (await import("../models/Property.js")).default;
+    properties = await Property.find().limit(20);
+  } else {
+    const { mockProperties } = await import("../config/mockData.js");
+    properties = mockProperties;
+  }
   
   const propertyContext = properties.map(p =>
     `${p.title} (${p.type}) in ${p.location} for ₹${p.price.toLocaleString("en-IN")}. ${p.rooms}BHK.`

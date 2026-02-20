@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "node:crypto";
 import User from "../models/User.js";
+import { isConnected } from "../config/database.js";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -20,6 +21,19 @@ export async function register(req, res) {
   }
 
   try {
+    if (!isConnected()) {
+      // Return a mock success response when DB is not connected
+      // In production, you might want to return an error instead
+      console.warn("Database not connected. Registration not persisted.");
+      return res.status(201).json({
+        id: "temp_" + Date.now(),
+        name,
+        email,
+        role: role || "user",
+        message: "Registration successful (demo mode - database not connected)"
+      });
+    }
+
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(409).json({ message: "Email already registered" });
@@ -41,6 +55,15 @@ export async function register(req, res) {
     });
   } catch (error) {
     console.error("Registration error:", error);
+    
+    // Handle Mongoose connection errors
+    if (error.name === 'MongoServerError' || error.message?.includes('buffering timed out')) {
+      return res.status(503).json({ 
+        message: "Database connection unavailable. Please try again later.",
+        error: "Service temporarily unavailable"
+      });
+    }
+    
     return res.status(500).json({ message: "Registration failed", error: error.message });
   }
 }
@@ -53,6 +76,27 @@ export async function login(req, res) {
   }
 
   try {
+    if (!isConnected()) {
+      // Mock login for demo mode
+      console.warn("Database not connected. Login not authenticated.");
+      const role = /agent/i.test(email) ? "agent" : "user";
+      const token = jwt.sign(
+        { sub: "temp_" + Date.now(), role },
+        process.env.JWT_SECRET || "dev-secret",
+        { expiresIn: "1d" }
+      );
+      return res.json({
+        token,
+        user: {
+          id: "temp",
+          email,
+          role,
+          name: email.split("@")[0]
+        },
+        message: "Login successful (demo mode - database not connected)"
+      });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -80,6 +124,15 @@ export async function login(req, res) {
     });
   } catch (error) {
     console.error("Login error:", error);
+    
+    // Handle Mongoose connection errors
+    if (error.name === 'MongoServerError' || error.message?.includes('buffering timed out')) {
+      return res.status(503).json({ 
+        message: "Database connection unavailable. Please try again later.",
+        error: "Service temporarily unavailable"
+      });
+    }
+    
     return res.status(500).json({ message: "Login failed" });
   }
 }
