@@ -10,7 +10,26 @@ export async function createOrder(req, res) {
   }
 
   if (!process.env.RAZORPAY_KEY_ID) {
-    return res.status(500).json({ message: "Razorpay credentials not configured" });
+    const mockOrder = {
+      id: "order_mock_" + Date.now(),
+      amount: Number(amount) * 100,
+      currency: "INR",
+      status: "created",
+      notes: { mock: true },
+      mock: true
+    };
+    try {
+      await Booking.create({
+        orderId: mockOrder.id,
+        amount: mockOrder.amount,
+        currency: mockOrder.currency,
+        status: "created",
+        mock: true
+      });
+    } catch (e) {
+      // ignore persistence errors in mock mode
+    }
+    return res.json(mockOrder);
   }
 
   try {
@@ -83,4 +102,5 @@ export async function verifyPayment(req, res) {
     res.status(400).json({ message: "Invalid signature", success: false });
   }
 }
+
 

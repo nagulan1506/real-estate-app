@@ -8,6 +8,18 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
 
   useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsed = JSON.parse(storedUser);
+        if (parsed && typeof parsed === "object") {
+          setUser(parsed);
+        }
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
     if (token) {
       api.defaults.headers.common.Authorization = `Bearer ${token}`;
     } else {
@@ -19,11 +31,15 @@ export function AuthProvider({ children }) {
     setToken(data.token);
     localStorage.setItem("token", data.token);
     setUser(data.user);
+    try {
+      localStorage.setItem("user", JSON.stringify(data.user));
+    } catch {}
   };
   const logout = () => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
   };
 
   return (

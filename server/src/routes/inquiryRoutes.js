@@ -7,3 +7,4 @@ router.post("/", inquiryController.createInquiry);
 
 export default router;
 
+

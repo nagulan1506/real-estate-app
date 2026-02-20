@@ -233,6 +233,45 @@ The backend can be deployed to:
 - DigitalOcean
 - Any Node.js hosting service
 
+## 🔄 Maintaining Separate Repositories
+
+Keep frontend and backend as two independent repositories to simplify deployments and CI/CD.
+
+- Create two GitHub repositories, for example:
+  - frontend: NoBrokerNoCry-frontend
+  - backend: NoBrokerNoCry-backend
+- Initialize and push each subfolder independently:
+
+```bash
+# Frontend
+cd client
+git init
+git remote add origin <your-frontend-repo-url>
+git add -A
+git commit -m "Initialize frontend"
+git push -u origin main
+
+# Backend
+cd ../server
+git init
+git remote add origin <your-backend-repo-url>
+git add -A
+git commit -m "Initialize backend"
+git push -u origin main
+```
+
+Tip: Keep the API base URL in client/.env (VITE_API_BASE) pointing to your backend deployment.
+
+## 💳 Payment Setup
+
+This project integrates Razorpay for bookings. For development without keys, the backend now supports a mock order flow.
+
+- Production: set these in server/.env
+  - RAZORPAY_KEY_ID
+  - RAZORPAY_KEY_SECRET
+- Frontend: set VITE_RAZORPAY_KEY_ID in client/.env for the checkout key
+- Mock mode: if keys are absent, the backend returns a mock order (id starts with order_mock_) and the flow completes via signature-less verification
+
 ## 📄 License
 
 This project is private and proprietary.
@@ -248,4 +287,5 @@ For support, please open an issue in the repository or contact the development t
 ---
 
 **Note**: This project maintains separate repositories for frontend and backend. Each repository should be independently deployable and maintainable.
+
 

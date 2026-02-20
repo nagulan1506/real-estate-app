@@ -190,3 +190,4 @@ export async function seedDB() {
   console.log("Seeded Chennai agents and properties");
 }
 
+

@@ -7,3 +7,4 @@ router.post("/", appointmentController.createAppointment);
 
 export default router;
 
+

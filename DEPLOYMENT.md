@@ -112,3 +112,4 @@ After deployment, test these endpoints:
 - Backend Properties: https://real-estate-app-h0om.onrender.com/api/properties
 - Backend Agents: https://real-estate-app-h0om.onrender.com/api/agents
 
+

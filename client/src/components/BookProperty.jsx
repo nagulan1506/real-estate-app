@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useAuth } from "../context/Auth.jsx";
 import api from "../lib/api";
 
 export default function BookProperty({ property }) {
     const [loading, setLoading] = useState(false);
+    const { user } = useAuth();
 
     const handleBooking = async () => {
         setLoading(true);
@@ -61,8 +63,8 @@ export default function BookProperty({ property }) {
                     }
                 },
                 prefill: {
-                    name: "User Name", // TODO: Get from user context
-                    email: "user@example.com",
+                    name: user?.name || user?.email?.split("@")[0] || "Guest User",
+                    email: user?.email || "user@example.com",
                     contact: "9999999999"
                 },
                 theme: {

@@ -12,3 +12,4 @@ router.delete("/:id", authMiddleware("agent"), propertyController.deleteProperty
 
 export default router;
 
+
