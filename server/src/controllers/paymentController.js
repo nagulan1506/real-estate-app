@@ -9,14 +9,18 @@ export async function createOrder(req, res) {
     return res.status(400).json({ message: "Amount is required" });
   }
 
-  if (!process.env.RAZORPAY_KEY_ID) {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    if (process.env.RAZORPAY_KEY_ID && !process.env.RAZORPAY_KEY_SECRET) {
+      console.warn("Razorpay Key ID present but Secret missing. Falling back to Mock Mode.");
+    }
     const mockOrder = {
       id: "order_mock_" + Date.now(),
       amount: Number(amount) * 100,
       currency: "INR",
       status: "created",
       notes: { mock: true },
-      mock: true
+      mock: true,
+      keyId: process.env.RAZORPAY_KEY_ID || "none"
     };
     try {
       await Booking.create({
