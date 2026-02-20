@@ -14,6 +14,7 @@ import AgentDB from "./pages/AgentDashboard.jsx";
 import Compare from "./pages/Compare.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
+import About from "./pages/About.jsx";
 import AIChatBubble from "./components/AIChatBubble.jsx";
 import Debug from "./components/Debug.jsx";
 import logo from "./assets/logo.svg";
@@ -32,6 +33,7 @@ function Layout({ children }) {
             <Link to="/" className="hover:text-gray-200 transition">Listings</Link>
             <Link to="/agents" className="hover:text-gray-200 transition">Agents</Link>
             <Link to="/compare" className="hover:text-gray-200 transition">Compare</Link>
+            <Link to="/about" className="hover:text-gray-200 transition">About</Link>
             <AuthBar />
           </nav>
         </div>
@@ -513,6 +515,7 @@ export default function App() {
         <Route path="/reset-password/:token" element={<Layout><ResetPassword /></Layout>} />
         <Route path="/agent" element={<Layout><AgentDB /></Layout>} />
         <Route path="/compare" element={<Layout><CompareWrapper /></Layout>} />
+        <Route path="/about" element={<Layout><About /></Layout>} />
       </Routes>
       <Debug />
       <AIChatBubble />
