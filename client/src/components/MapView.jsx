@@ -12,14 +12,15 @@ const icon = new L.Icon({
 });
 
 export default function MapView({ properties }) {
-  const center = properties.length
-    ? [properties[0].lat || 0, properties[0].lng || 0]
+  const safeProperties = Array.isArray(properties) ? properties : [];
+  const center = safeProperties.length
+    ? [safeProperties[0].lat || 0, safeProperties[0].lng || 0]
     : [13.0827, 80.2707]; // Default to Chennai
   return (
     <div className="h-80 w-full rounded-xl overflow-hidden shadow-lg border border-gray-700">
       <MapContainer center={center} zoom={11} className="h-full w-full">
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {properties.map((p) => (
+        {safeProperties.map((p) => (
           <Marker key={p.id} position={[p.lat, p.lng]} icon={icon}>
             <Popup>
               <div className="text-sm">

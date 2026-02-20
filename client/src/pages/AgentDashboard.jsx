@@ -20,7 +20,11 @@ export default function AgentDashboard() {
 
   useEffect(() => {
     api.get("/properties").then((res) => {
-      setProperties(res.data.filter((p) => p.agentId === user?.id || p.agentId?._id === user?.id));
+      const data = Array.isArray(res.data) ? res.data : [];
+      setProperties(data.filter((p) => p.agentId === user?.id || p.agentId?._id === user?.id));
+    }).catch(err => {
+      console.error("Failed to load properties:", err);
+      setProperties([]);
     });
   }, [user]);
 

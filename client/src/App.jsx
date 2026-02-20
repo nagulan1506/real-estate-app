@@ -92,6 +92,7 @@ function ListingsPage() {
       ))
       .catch(err => {
         console.error(err);
+        setProperties([]); // Ensure properties is always an array
         alert("Failed to load listings: " + (err.response?.data?.message || err.message));
       });
   }, [query]);
@@ -252,9 +253,15 @@ function PropertyDetailPage() {
     api.get(`/properties/${id}`).then((res) => {
       setProperty(res.data);
       api.get("/agents").then((aRes) => {
-        const match = aRes.data.find((a) => a.properties?.includes(res.data.id));
+        const agents = Array.isArray(aRes.data) ? aRes.data : [];
+        const match = agents.find((a) => a.properties?.includes(res.data.id));
         setAgent(match || null);
+      }).catch(err => {
+        console.error("Failed to load agents:", err);
+        setAgent(null);
       });
+    }).catch(err => {
+      console.error("Failed to load property:", err);
     });
   }, [id]);
 
@@ -381,9 +388,10 @@ function AgentsPage() {
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     api.get("/agents")
-      .then((res) => setAgents(res.data))
+      .then((res) => setAgents(Array.isArray(res.data) ? res.data : []))
       .catch(err => {
         console.error(err);
+        setAgents([]);
         alert("Failed to load agents: " + (err.response?.data?.message || err.message));
       });
   }, []);
