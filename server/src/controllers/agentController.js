@@ -6,16 +6,27 @@ import { mockAgents, mockProperties } from "../config/mockData.js";
 export async function getAgents(req, res) {
   try {
     if (isConnected()) {
-      const agents = await Agent.find();
-      return res.json(agents);
-    } else {
-      // Fallback to mock data
-      return res.json(mockAgents);
+      try {
+        const agents = await Agent.find();
+        // If database is connected but empty, return mock data
+        if (agents && agents.length > 0) {
+          return res.json(agents);
+        }
+        // Fall through to mock data if database is empty
+      } catch (dbError) {
+        console.error("Database query error:", dbError);
+        // Fall through to mock data
+      }
     }
+    
+    // Always return mock data if DB not connected or empty
+    console.log(`Returning ${mockAgents.length} agents (mock data)`);
+    return res.json(mockAgents);
   } catch (error) {
     console.error("Get agents error:", error);
-    // Fallback to mock data on error
-    res.json(mockAgents);
+    // Always return mock data on error
+    console.log(`Returning ${mockAgents.length} agents (fallback)`);
+    return res.json(mockAgents);
   }
 }
 

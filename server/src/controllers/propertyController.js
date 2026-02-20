@@ -7,47 +7,58 @@ export async function getProperties(req, res) {
   
   try {
     if (isConnected()) {
-      const q = {};
-      if (location) q.location = new RegExp(String(location), "i");
-      if (type) q.type = String(type);
-      if (rooms && !Number.isNaN(Number(rooms))) {
-        q.rooms = { $gte: Number(rooms) };
-      }
-      if (!Number.isNaN(Number(minPrice)) || !Number.isNaN(Number(maxPrice))) {
-        q.price = {};
-        if (!Number.isNaN(Number(minPrice))) q.price.$gte = Number(minPrice);
-        if (!Number.isNaN(Number(maxPrice))) q.price.$lte = Number(maxPrice);
-      }
+      try {
+        const q = {};
+        if (location) q.location = new RegExp(String(location), "i");
+        if (type) q.type = String(type);
+        if (rooms && !Number.isNaN(Number(rooms))) {
+          q.rooms = { $gte: Number(rooms) };
+        }
+        if (!Number.isNaN(Number(minPrice)) || !Number.isNaN(Number(maxPrice))) {
+          q.price = {};
+          if (!Number.isNaN(Number(minPrice))) q.price.$gte = Number(minPrice);
+          if (!Number.isNaN(Number(maxPrice))) q.price.$lte = Number(maxPrice);
+        }
 
-      const properties = await Property.find(q);
-      return res.json(properties);
-    } else {
-      // Fallback to mock data
-      let result = [...mockProperties];
-      if (location) {
-        result = result.filter((p) => p.location.toLowerCase().includes(String(location).toLowerCase()));
+        const properties = await Property.find(q);
+        // If database is connected but empty, return mock data
+        if (properties && properties.length > 0) {
+          return res.json(properties);
+        }
+        // Fall through to mock data if database is empty
+      } catch (dbError) {
+        console.error("Database query error:", dbError);
+        // Fall through to mock data
       }
-      if (type) {
-        result = result.filter((p) => p.type.toLowerCase() === String(type).toLowerCase());
-      }
-      if (rooms) {
-        const r = Number(rooms);
-        if (!Number.isNaN(r)) result = result.filter((p) => p.rooms >= r);
-      }
-      if (minPrice) {
-        const m = Number(minPrice);
-        if (!Number.isNaN(m)) result = result.filter((p) => p.price >= m);
-      }
-      if (maxPrice) {
-        const m = Number(maxPrice);
-        if (!Number.isNaN(m)) result = result.filter((p) => p.price <= m);
-      }
-      return res.json(result);
     }
+    
+    // Always return mock data if DB not connected or empty
+    let result = [...mockProperties];
+    if (location) {
+      result = result.filter((p) => p.location.toLowerCase().includes(String(location).toLowerCase()));
+    }
+    if (type) {
+      result = result.filter((p) => p.type.toLowerCase() === String(type).toLowerCase());
+    }
+    if (rooms) {
+      const r = Number(rooms);
+      if (!Number.isNaN(r)) result = result.filter((p) => p.rooms >= r);
+    }
+    if (minPrice) {
+      const m = Number(minPrice);
+      if (!Number.isNaN(m)) result = result.filter((p) => p.price >= m);
+    }
+    if (maxPrice) {
+      const m = Number(maxPrice);
+      if (!Number.isNaN(m)) result = result.filter((p) => p.price <= m);
+    }
+    console.log(`Returning ${result.length} properties (mock data)`);
+    return res.json(result);
   } catch (error) {
     console.error("Get properties error:", error);
-    // Fallback to mock data on error
-    res.json(mockProperties);
+    // Always return mock data on error
+    console.log(`Returning ${mockProperties.length} properties (fallback)`);
+    return res.json(mockProperties);
   }
 }
 

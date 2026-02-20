@@ -43,9 +43,27 @@ app.use("/api", aiRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Debug route to test auth routes
+// Debug routes to test endpoints
 app.get("/api/auth/test", (req, res) => {
   res.json({ message: "Auth routes are working", timestamp: new Date().toISOString() });
+});
+
+app.get("/api/test/properties", async (req, res) => {
+  const { mockProperties } = await import("./config/mockData.js");
+  res.json({ 
+    message: "Mock properties available", 
+    count: mockProperties.length,
+    sample: mockProperties[0]
+  });
+});
+
+app.get("/api/test/agents", async (req, res) => {
+  const { mockAgents } = await import("./config/mockData.js");
+  res.json({ 
+    message: "Mock agents available", 
+    count: mockAgents.length,
+    sample: mockAgents[0]
+  });
 });
 
 // 404 handler for debugging
