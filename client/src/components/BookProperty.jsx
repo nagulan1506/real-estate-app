@@ -7,9 +7,11 @@ export default function BookProperty({ property }) {
     const { user } = useAuth();
 
     const handleBooking = async () => {
+        console.log("Starting booking process...");
         setLoading(true);
         try {
             const token = localStorage.getItem("token");
+            console.log("Token present:", !!token);
             if (!token) {
                 alert("Please login to book a property");
                 setLoading(false);
@@ -17,17 +19,21 @@ export default function BookProperty({ property }) {
             }
 
             // 1. Create Order
+            console.log("Creating order...");
             const orderRes = await api.post("/payment/order", { amount: 500 }); // Fixed booking amount
             const order = orderRes.data;
+            console.log("Order created:", order);
 
             // Handle Mock Order (Test Mode without Keys)
             if (order.mock) {
+                console.log("Handling mock order...");
                 if (confirm("Mock Payment Mode: Simulate successful payment?")) {
                     const verifyRes = await api.post("/payment/verify", {
                         razorpay_order_id: order.id,
                         razorpay_payment_id: "pay_mock_" + Date.now(),
                         razorpay_signature: "mock_signature"
                     });
+                    console.log("Mock verification result:", verifyRes.data);
                     if (verifyRes.data.success) {
                         alert("Booking Successful! (Mock Payment Verified)");
                     }
@@ -37,8 +43,9 @@ export default function BookProperty({ property }) {
             }
 
             // 2. Open Razorpay
+            console.log("Opening Razorpay with key:", import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SIJSZT4bHX9sWW");
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_YOUR_KEY_HERE", // Fallback for dev
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SIJSZT4bHX9sWW",
                 amount: order.amount,
                 currency: order.currency,
                 name: "Real Estate App",
