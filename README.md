@@ -26,6 +26,7 @@ This project is organized into two separate repositories:
 - **User Authentication**: Secure registration and login system
 - **Booking System**: Schedule property viewings and make bookings
 - **Payment Integration**: Secure payment processing with Razorpay
+- **About Section**: Detailed information about the platform and its mission
 - **Favorites**: Save and manage favorite properties
 - **Advanced Filters**: Filter properties by location, price, type, and rooms
 
