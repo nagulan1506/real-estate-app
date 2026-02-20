@@ -4,7 +4,7 @@ import Booking from "../models/Booking.js";
 
 export async function createOrder(req, res) {
   const { amount } = req.body;
-  
+
   if (!amount) {
     return res.status(400).json({ message: "Amount is required" });
   }
@@ -72,13 +72,11 @@ export async function verifyPayment(req, res) {
 
   if (razorpay_order_id.startsWith("order_mock_")) {
     console.log("Verifying mock payment");
-    await Booking.create({
-      orderId: razorpay_order_id,
-      paymentId: razorpay_payment_id,
-      amount: 50000,
-      status: "paid",
-      mock: true
-    });
+    await Booking.findOneAndUpdate(
+      { orderId: razorpay_order_id },
+      { paymentId: razorpay_payment_id, status: "paid", mock: true },
+      { upsert: true }
+    );
     return res.json({ message: "Mock payment verified", success: true });
   }
 
