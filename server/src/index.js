@@ -18,6 +18,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 dotenv.config();
 
 const app = express();
+// CORS - allow all origins (can be restricted in production if needed)
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
