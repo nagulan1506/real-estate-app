@@ -1,151 +1,173 @@
+import { Link } from "react-router-dom";
+
+const stats = [
+  { label: "Properties Listed", value: "500+" },
+  { label: "Verified Agents", value: "50+" },
+  { label: "Happy Clients", value: "1200+" },
+  { label: "Cities Covered", value: "10+" },
+];
+
+const features = [
+  { icon: "🏠", title: "Full-Featured Listings", desc: "Detailed property listings with photos, pricing, and specs across Chennai." },
+  { icon: "✨", title: "AI Neighborhood Insights", desc: "Gemini AI-powered insights for each locality to help you decide smarter." },
+  { icon: "🗺️", title: "Interactive Map View", desc: "Browse properties visually on an interactive Leaflet map." },
+  { icon: "⚖️", title: "Property Comparison", desc: "Compare up to 3 properties side-by-side to find your best match." },
+  { icon: "💳", title: "Secure Payments", desc: "Razorpay-powered secure booking token payments with instant verification." },
+  { icon: "📅", title: "Schedule Viewings", desc: "Book appointments directly with verified agents in a few clicks." },
+];
+
+const techStack = [
+  { name: "React 18", color: "text-sky-400", bg: "bg-sky-500/10", icon: "⚛️" },
+  { name: "Node.js & Express", color: "text-green-400", bg: "bg-green-500/10", icon: "🟢" },
+  { name: "MongoDB & Mongoose", color: "text-emerald-400", bg: "bg-emerald-500/10", icon: "🍃" },
+  { name: "TailwindCSS", color: "text-cyan-400", bg: "bg-cyan-500/10", icon: "💨" },
+  { name: "Razorpay", color: "text-blue-400", bg: "bg-blue-500/10", icon: "💳" },
+  { name: "Gemini AI", color: "text-purple-400", bg: "bg-purple-500/10", icon: "✨" },
+  { name: "Leaflet Maps", color: "text-lime-400", bg: "bg-lime-500/10", icon: "🗺️" },
+  { name: "JWT Auth", color: "text-yellow-400", bg: "bg-yellow-500/10", icon: "🔐" },
+];
+
+const locations = {
+  "Premium Zones": ["Anna Nagar", "T. Nagar", "Adyar", "Nungambakkam"],
+  "IT Corridor": ["OMR", "Sholinganallur", "Thoraipakkam", "Porur"],
+  "Coastal Areas": ["ECR", "Beachfront", "Neelankarai"],
+  "Emerging Areas": ["Vadapalani", "Velachery", "Mylapore"],
+};
+
 export default function About() {
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-primary-gradient mb-4">
-          About NoBrokerNoCry
+    <div className="max-w-5xl mx-auto space-y-12 pb-12">
+
+      {/* Hero */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 border border-gray-800 p-10 text-center">
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-sky-500/5 pointer-events-none" />
+        <h1 className="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-sky-400 mb-4">
+          NoBrokerNoCry
         </h1>
-        <p className="text-xl text-gray-300">
-          Your trusted partner in finding your dream home in Chennai
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          Chennai's modern real estate platform — connecting buyers, renters, and verified agents with AI-powered insights and zero broker hassle.
         </p>
+        <div className="flex gap-4 justify-center mt-6">
+          <Link to="/" className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-full transition shadow-lg">
+            Browse Properties
+          </Link>
+          <Link to="/agents" className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full border border-white/20 transition">
+            Meet the Agents
+          </Link>
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 mt-12">
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-          <h2 className="text-2xl font-semibold text-white mb-4">Our Mission</h2>
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {stats.map((s) => (
+          <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-xl p-5 text-center hover:border-emerald-800 transition">
+            <div className="text-3xl font-extrabold text-emerald-400">{s.value}</div>
+            <div className="text-sm text-gray-400 mt-1">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Mission */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-7">
+          <h2 className="text-2xl font-bold text-white mb-3">Our Mission</h2>
           <p className="text-gray-300 leading-relaxed">
-            At NoBrokerNoCry, we believe that finding your perfect home should be a seamless and enjoyable experience. 
-            We connect homebuyers with trusted real estate agents and provide comprehensive property listings across Chennai, 
-            making the journey to homeownership smooth and stress-free.
+            At NoBrokerNoCry, we believe finding your perfect home should be seamless and stress-free. We cut out the middlemen and connect you directly with verified agents, backed by AI insights and a modern search experience.
           </p>
         </div>
-
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-          <h2 className="text-2xl font-semibold text-white mb-4">What We Offer</h2>
-          <ul className="text-gray-300 space-y-2">
-            <li className="flex items-start">
-              <span className="text-emerald-400 mr-2">✓</span>
-              <span>Comprehensive property listings with detailed information</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-emerald-400 mr-2">✓</span>
-              <span>AI-powered neighborhood insights</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-emerald-400 mr-2">✓</span>
-              <span>Property comparison tools</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-emerald-400 mr-2">✓</span>
-              <span>Direct connection with verified agents</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-emerald-400 mr-2">✓</span>
-              <span>Interactive map view of properties</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-emerald-400 mr-2">✓</span>
-              <span>Secure booking and payment options</span>
-            </li>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-7">
+          <h2 className="text-2xl font-bold text-white mb-3">Why It's Different</h2>
+          <ul className="text-gray-300 space-y-2 text-sm">
+            {["No hidden broker fees", "AI-generated locality insights", "Real-time appointment booking", "Secure Razorpay payment gateway", "Side-by-side property comparison"].map((item) => (
+              <li key={item} className="flex items-center gap-2">
+                <span className="text-emerald-400 text-base">✓</span> {item}
+              </li>
+            ))}
           </ul>
         </div>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mt-8">
-        <h2 className="text-2xl font-semibold text-white mb-4">Why Choose Us?</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          <div>
-            <h3 className="text-lg font-semibold text-emerald-400 mb-2">Transparency</h3>
-            <p className="text-gray-300 text-sm">
-              We provide clear, detailed information about every property, ensuring you make informed decisions.
-            </p>
+      {/* Features */}
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-5">Features</h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          {features.map((f) => (
+            <div key={f.title} className="bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition">
+              <div className="text-3xl mb-3">{f.icon}</div>
+              <h3 className="text-white font-semibold mb-1">{f.title}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Tech Stack */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-7">
+        <h2 className="text-2xl font-bold text-white mb-5">Built With</h2>
+        <div className="flex flex-wrap gap-3">
+          {techStack.map((t) => (
+            <span key={t.name} className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${t.bg} ${t.color} border border-current/20`}>
+              <span>{t.icon}</span> {t.name}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Coverage */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-7">
+        <h2 className="text-2xl font-bold text-white mb-5">Our Coverage — Chennai</h2>
+        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5">
+          {Object.entries(locations).map(([zone, areas]) => (
+            <div key={zone}>
+              <h3 className="text-sm font-semibold text-emerald-400 uppercase tracking-wider mb-2">{zone}</h3>
+              <ul className="space-y-1">
+                {areas.map((a) => (
+                  <li key={a} className="text-gray-400 text-sm flex items-center gap-1">
+                    <span className="text-gray-600">›</span> {a}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Developer / Contact */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-7">
+        <h2 className="text-2xl font-bold text-white mb-5">Developer</h2>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-sky-500 flex items-center justify-center text-2xl font-bold text-white flex-shrink-0">
+            N
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-emerald-400 mb-2">Expert Agents</h3>
-            <p className="text-gray-300 text-sm">
-              Our network of verified real estate agents specializes in different areas of Chennai, 
-              bringing local expertise to your search.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-emerald-400 mb-2">Technology-Driven</h3>
-            <p className="text-gray-300 text-sm">
-              Leveraging AI and modern technology to provide insights and streamline your property search experience.
-            </p>
+            <div className="text-white font-bold text-lg">Nagulan</div>
+            <div className="text-gray-400 text-sm mt-1">Full-Stack Developer · MERN Stack · Chennai, India</div>
+            <div className="flex gap-4 mt-3">
+              <a
+                href="https://github.com/Nagulan1506"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-sky-400 hover:text-sky-300 transition flex items-center gap-1"
+              >
+                GitHub ↗
+              </a>
+              <a
+                href="https://www.linkedin.com/in/nagulan-s"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-400 hover:text-blue-300 transition flex items-center gap-1"
+              >
+                LinkedIn ↗
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mt-8">
-        <h2 className="text-2xl font-semibold text-white mb-4">Our Coverage</h2>
-        <p className="text-gray-300 mb-4">
-          We specialize in properties across Chennai, with a focus on:
-        </p>
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-2">Premium Locations</h3>
-            <ul className="text-gray-400 text-sm space-y-1">
-              <li>• Anna Nagar</li>
-              <li>• T. Nagar</li>
-              <li>• Adyar</li>
-              <li>• Nungambakkam</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-2">IT Corridor</h3>
-            <ul className="text-gray-400 text-sm space-y-1">
-              <li>• OMR (Old Mahabalipuram Road)</li>
-              <li>• Sholinganallur</li>
-              <li>• Thoraipakkam</li>
-              <li>• Porur</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-2">Coastal Areas</h3>
-            <ul className="text-gray-400 text-sm space-y-1">
-              <li>• ECR (East Coast Road)</li>
-              <li>• Beachfront properties</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-2">Emerging Areas</h3>
-            <ul className="text-gray-400 text-sm space-y-1">
-              <li>• Vadapalani</li>
-              <li>• Velachery</li>
-              <li>• Mylapore</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mt-8 text-center">
-        <h2 className="text-2xl font-semibold text-white mb-4">Get Started Today</h2>
-        <p className="text-gray-300 mb-6">
-          Ready to find your dream home? Browse our listings, connect with agents, or use our AI assistant 
-          to get personalized recommendations.
-        </p>
-        <div className="flex gap-4 justify-center">
-          <a
-            href="/"
-            className="px-6 py-3 bg-[#87CEEB] text-gray-900 font-bold rounded-full hover:bg-[#76c2e3] transition"
-          >
-            Browse Properties
-          </a>
-          <a
-            href="/agents"
-            className="px-6 py-3 bg-gray-700 text-white font-bold rounded-full hover:bg-gray-600 transition"
-          >
-            View Agents
-          </a>
-        </div>
-      </div>
-
-      <div className="text-center text-gray-400 text-sm mt-8 pb-8">
-        <p>© {new Date().getFullYear()} NoBrokerNoCry. All rights reserved.</p>
-        <p className="mt-2">Crafted with love in Chennai, India</p>
+      {/* Footer note */}
+      <div className="text-center text-gray-500 text-sm pb-4">
+        <p>© {new Date().getFullYear()} NoBrokerNoCry · Crafted with ❤️ in Chennai, India</p>
       </div>
     </div>
   );
 }
-
-

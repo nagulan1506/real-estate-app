@@ -1,312 +1,245 @@
-# NoBrokerNoCry - Backend API
+# 🏠 NoBrokerNoCry — Backend API
 
-RESTful API server for the NoBrokerNoCry real estate platform, built with Node.js, Express, and MongoDB following the MVC (Model-View-Controller) architecture pattern.
+> **Live API**: [https://real-estate-api.onrender.com](https://real-estate-api.onrender.com)  
+> **Health Check**: `GET /api/health`
 
-## 🏗️ Architecture
+Express + MongoDB REST API for **NoBrokerNoCry** — a modern real estate platform. Handles authentication, property & agent data, AI insights, appointments, inquiries, and Razorpay payment processing.
 
-This backend follows the **MVC (Model-View-Controller)** pattern:
+---
 
-- **Models**: Database schemas and data models
-- **Views**: Not applicable (API-only, no views)
-- **Controllers**: Business logic and request handling
-- **Routes**: API endpoint definitions
-- **Middleware**: Authentication and other middleware functions
+## 🛠️ Tech Stack
 
-## 🚀 Getting Started
+- **Runtime**: Node.js 18+ with ES Modules
+- **Framework**: Express 4
+- **Database**: MongoDB via Mongoose 8
+- **Auth**: JWT (jsonwebtoken) + bcryptjs
+- **AI**: Google Generative AI (Gemini)
+- **Payments**: Razorpay Node SDK
+- **Email**: Nodemailer
+- **Validation**: Zod
+- **Logging**: Morgan
+
+---
+
+## 🚀 Local Setup
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- MongoDB (local or cloud instance)
-- npm or yarn
+- Node.js ≥ 18.x
+- MongoDB (local or Atlas connection string)
 
-### Installation
+### Steps
 
 ```bash
+# 1. Clone this repo
+git clone https://github.com/YOUR_USERNAME/real-estate-server.git
+cd real-estate-server
+
+# 2. Install dependencies
 npm install
-```
 
-### Environment Variables
+# 3. Configure environment variables
+cp .env.example .env
+# Then edit .env with your values
 
-Create a `.env` file in the root of the `server/` directory:
-
-```env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/realestate
-JWT_SECRET=your_super_secret_jwt_key_here
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
-FRONTEND_URL=http://localhost:5173
-GEMINI_API_KEY=your_google_gemini_api_key
-RAZORPAY_KEY_ID=your_razorpay_key_id
-RAZORPAY_KEY_SECRET=your_razorpay_key_secret
-```
-
-### Development
-
-```bash
+# 4. Start development server
 npm run dev
 ```
 
-The server will start on http://localhost:5000
+The API will be available at **http://localhost:5000**
 
-### Production
+---
 
-```bash
-npm start
+## 🔑 Environment Variables
+
+Create a `.env` file in the root of this directory:
+
+```env
+# ---- Server ----
+PORT=5000
+
+# ---- Database ----
+MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/real-estate
+
+# ---- Auth ----
+JWT_SECRET=your_super_secret_jwt_key
+
+# ---- Frontend (for CORS + email links) ----
+FRONTEND_URL=http://localhost:5173
+
+# ---- Payments (Razorpay) ----
+RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxxxxxx
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+
+# ---- AI ----
+GEMINI_API_KEY=your_google_generative_ai_key
+
+# ---- Email ----
+EMAIL_USER=your_gmail@gmail.com
+EMAIL_PASS=your_gmail_app_password
 ```
 
-## 📁 Project Structure
+| Variable | Required | Description |
+|---|---|---|
+| `PORT` | Optional | Server port (default: `5000`) |
+| `MONGODB_URI` | ✅ Yes | MongoDB connection string |
+| `JWT_SECRET` | ✅ Yes | Secret for signing JWT tokens |
+| `FRONTEND_URL` | ✅ Yes | Frontend URL for CORS and email links |
+| `RAZORPAY_KEY_ID` | Optional | Razorpay test key ID |
+| `RAZORPAY_KEY_SECRET` | Optional | Razorpay test key secret |
+| `GEMINI_API_KEY` | Optional | Google Gemini AI key |
+| `EMAIL_USER` | Optional | Gmail address for password reset emails |
+| `EMAIL_PASS` | Optional | Gmail App Password |
+
+> **Note**: If Razorpay keys are missing, the server automatically falls back to **mock mode** and returns simulated orders — useful for testing without real credentials.
+
+---
+
+## 📡 API Reference
+
+### Auth — `/api/auth`
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | — | Register a new user |
+| `POST` | `/api/auth/login` | — | Login and receive JWT token |
+| `POST` | `/api/auth/forgot-password` | — | Send password reset email |
+| `POST` | `/api/auth/reset-password/:token` | — | Reset password using token |
+
+### Properties — `/api/properties`
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/properties` | — | List all properties (supports filters: `type`, `location`, `minPrice`, `maxPrice`) |
+| `GET` | `/api/properties/:id` | — | Get a single property by ID |
+| `POST` | `/api/properties` | ✅ JWT | Create a new property (agent/admin) |
+| `PATCH` | `/api/properties/:id` | ✅ JWT | Update property |
+| `DELETE` | `/api/properties/:id` | ✅ JWT | Delete property |
+
+### Agents — `/api/agents`
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/agents` | — | List all agents |
+| `GET` | `/api/agents/:id` | — | Get agent + handled properties |
+
+### Inquiries — `/api/inquiries`
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/inquiries` | — | Submit a property inquiry |
+
+### Appointments — `/api/appointments`
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/appointments` | — | Book a viewing appointment |
+
+### Payment (Razorpay) — `/api/payment`
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/payment/order` | ✅ JWT | Create a Razorpay order |
+| `POST` | `/api/payment/verify` | ✅ JWT | Verify signature after payment |
+
+### AI — `/api`
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/locality-insights` | — | Get AI-generated neighborhood insights |
+| `POST` | `/api/chat` | — | Chat with the AI assistant |
+
+### Admin — `/api/admin`
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/admin/bookings` | ✅ Admin | View all bookings |
+
+---
+
+## 💳 Payment Integration (Razorpay)
+
+### How It Works
+
+```
+Client                          Server                        Razorpay
+  │── POST /api/payment/order ──►│── orders.create(amount) ──►│
+  │◄── { order_id, amount } ─────│◄─── { id, amount } ────────│
+  │
+  │ [User pays in Razorpay modal]
+  │
+  │── POST /api/payment/verify ──►│── HMAC-SHA256 verify ──────│
+  │◄── { success: true } ─────────│── Booking updated in DB ───│
+```
+
+**Signature Verification** (server-side):
+```js
+const expectedSignature = crypto
+  .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+  .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+  .digest("hex");
+const isAuthentic = expectedSignature === razorpay_signature;
+```
+
+### Mock Mode
+If `RAZORPAY_KEY_ID` or `RAZORPAY_KEY_SECRET` are absent, the server returns a **mock order** (`mock: true`) and accepts mock verifications, allowing full end-to-end testing without Razorpay credentials.
+
+---
+
+## 🏗️ Project Structure
 
 ```
 server/
 ├── src/
 │   ├── config/
-│   │   ├── database.js          # MongoDB connection configuration
-│   │   └── seed.js              # Database seeding script
-│   ├── controllers/             # Business logic (MVC Controllers)
-│   │   ├── adminController.js
+│   │   ├── database.js     # MongoDB connection
+│   │   ├── seed.js         # DB seed logic
+│   │   └── mockData.js     # In-memory fallback data
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── propertyController.js
 │   │   ├── agentController.js
+│   │   ├── paymentController.js
+│   │   ├── adminController.js
 │   │   ├── aiController.js
 │   │   ├── appointmentController.js
-│   │   ├── authController.js
-│   │   ├── inquiryController.js
-│   │   ├── paymentController.js
-│   │   └── propertyController.js
-│   ├── middleware/              # Middleware functions
-│   │   └── auth.js             # JWT authentication middleware
-│   ├── models/                  # Database models (MVC Models)
+│   │   └── inquiryController.js
+│   ├── middleware/
+│   │   └── auth.js         # JWT auth middleware
+│   ├── models/
+│   │   ├── User.js
+│   │   ├── Property.js
 │   │   ├── Agent.js
 │   │   ├── Booking.js
-│   │   ├── Inquiry.js
-│   │   ├── Property.js
-│   │   └── User.js
-│   ├── routes/                  # API routes (MVC Routes)
-│   │   ├── adminRoutes.js
-│   │   ├── agentRoutes.js
-│   │   ├── aiRoutes.js
-│   │   ├── appointmentRoutes.js
-│   │   ├── authRoutes.js
-│   │   ├── inquiryRoutes.js
-│   │   ├── paymentRoutes.js
-│   │   └── propertyRoutes.js
-│   └── index.js                 # Application entry point
-└── package.json
+│   │   └── Inquiry.js
+│   ├── routes/             # Express routers
+│   └── index.js            # App entry point
+├── .env
+├── package.json
+└── README.md
 ```
 
-## 🎯 MVC Pattern Implementation
+---
 
-### Models (`src/models/`)
-Define the database schemas using Mongoose:
-- `User.js` - User authentication and profile
-- `Property.js` - Property listings
-- `Agent.js` - Real estate agents
-- `Inquiry.js` - Property inquiries
-- `Booking.js` - Property bookings and payments
+## 🌐 Deployment (Render)
 
-### Controllers (`src/controllers/`)
-Contain the business logic for handling requests:
-- `authController.js` - Authentication (register, login, password reset)
-- `propertyController.js` - Property CRUD operations
-- `agentController.js` - Agent information
-- `inquiryController.js` - Property inquiries
-- `appointmentController.js` - Appointment scheduling
-- `aiController.js` - AI-powered features (chat, insights)
-- `paymentController.js` - Payment processing
-- `adminController.js` - Admin dashboard
+1. **Connect** your GitHub repo to [Render](https://render.com)
+2. Set **Environment**: `Node`
+3. Set **Build Command**: `npm install`
+4. Set **Start Command**: `npm start`
+5. Add all **environment variables** in the Render dashboard → Environment
+6. Make sure your MongoDB Atlas cluster allows connections from `0.0.0.0/0` (or Render's IP)
 
-### Routes (`src/routes/`)
-Define API endpoints and connect them to controllers:
-- Each route file exports an Express router
-- Routes are mounted in `index.js`
-- Controllers handle the actual logic
+---
 
-### Middleware (`src/middleware/`)
-- `auth.js` - JWT authentication and authorization
+## 📦 Available Scripts
 
-## 🔌 API Endpoints
+| Command | Description |
+|---|---|
+| `npm run dev` | Start dev server with Nodemon (auto-restart) |
+| `npm start` | Start production server |
 
-### Authentication (`/api/auth`)
-- `POST /register` - Register new user
-- `POST /login` - User login
-- `POST /forgot-password` - Request password reset
-- `POST /reset-password` - Reset password with token
-
-### Properties (`/api/properties`)
-- `GET /` - Get all properties (with query filters)
-- `GET /:id` - Get property by ID
-- `POST /` - Create property (Agent only, requires auth)
-- `PATCH /:id` - Update property (Agent only, requires auth)
-- `DELETE /:id` - Delete property (Agent only, requires auth)
-
-### Agents (`/api/agents`)
-- `GET /` - Get all agents
-- `GET /:id` - Get agent by ID with handled properties
-
-### Inquiries (`/api/inquiries`)
-- `POST /` - Create property inquiry
-
-### Appointments (`/api/appointments`)
-- `POST /` - Schedule property viewing appointment
-
-### AI Services (`/api`)
-- `POST /locality-insights` - Get AI-generated neighborhood insights
-- `POST /chat` - AI chat assistant for property queries
-
-### Payments (`/api/payment`)
-- `POST /order` - Create Razorpay payment order
-- `POST /verify` - Verify payment signature
-
-### Admin (`/api/admin`)
-- `GET /summary` - Get admin dashboard summary (Admin only, requires auth)
-
-### Health Check
-- `GET /api/health` - Server health status
-
-## 🔐 Authentication
-
-The API uses JWT (JSON Web Tokens) for authentication. Protected routes require the token in the Authorization header:
-
-```
-Authorization: Bearer <token>
-```
-
-### User Roles
-- **user**: Regular users (default)
-- **agent**: Real estate agents
-- **admin**: Administrators
-
-## 🛡️ Security Features
-
-- Password hashing with bcrypt (10 rounds)
-- JWT token-based authentication
-- CORS protection
-- Input validation
-- Secure payment processing with Razorpay
-- Password reset with secure tokens
-
-## 📊 Database
-
-### MongoDB Collections
-- `users` - User accounts
-- `properties` - Property listings
-- `agents` - Real estate agents
-- `inquiries` - Property inquiries
-- `bookings` - Property bookings and payments
-
-### Database Seeding
-The application automatically seeds sample data on startup (agents and properties) if the database is empty.
-
-## 🔧 Dependencies
-
-### Core
-- `express` - Web framework
-- `mongoose` - MongoDB ODM
-- `dotenv` - Environment variables
-- `cors` - CORS middleware
-- `morgan` - HTTP request logger
-
-### Authentication
-- `jsonwebtoken` - JWT tokens
-- `bcryptjs` - Password hashing
-
-### External Services
-- `@google/generative-ai` - Google Gemini AI
-- `razorpay` - Payment gateway
-- `nodemailer` - Email sending
-
-## 🧪 Testing
-
-### Health Check
-```bash
-curl http://localhost:5000/api/health
-```
-
-### Register User
-```bash
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Test User","email":"test@example.com","password":"password123","role":"user"}'
-```
-
-### Login
-```bash
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123"}'
-```
-
-## 🚀 Deployment
-
-### Environment Setup
-1. Set all required environment variables
-2. Ensure MongoDB is accessible
-3. Configure CORS for your frontend domain
-
-### Recommended Platforms
-- **Render**: Easy deployment with automatic SSL
-- **Heroku**: Traditional PaaS option
-- **AWS**: EC2, Elastic Beanstalk, or Lambda
-- **DigitalOcean**: App Platform or Droplets
-
-### Production Checklist
-- [ ] Set secure `JWT_SECRET`
-- [ ] Configure production MongoDB URI
-- [ ] Set `FRONTEND_URL` to production domain
-- [ ] Enable HTTPS
-- [ ] Configure CORS for production domain
-- [ ] Set up email service credentials
-- [ ] Configure Razorpay production keys
-- [ ] Set up Gemini API key
-- [ ] Enable logging and monitoring
-
-## 📝 Error Handling
-
-The API returns standardized error responses:
-
-```json
-{
-  "message": "Error description",
-  "error": "Detailed error (development only)"
-}
-```
-
-### HTTP Status Codes
-- `200` - Success
-- `201` - Created
-- `400` - Bad Request
-- `401` - Unauthorized
-- `403` - Forbidden
-- `404` - Not Found
-- `409` - Conflict (e.g., email already exists)
-- `500` - Internal Server Error
-
-## 🔄 Database Migrations
-
-Currently, the application uses Mongoose's automatic schema management. For production, consider implementing proper migration scripts.
+---
 
 ## 📄 License
 
-Private and proprietary.
-
-## 🐛 Troubleshooting
-
-### MongoDB Connection Issues
-- Verify `MONGODB_URI` is correct
-- Check MongoDB is running
-- Verify network connectivity
-
-### JWT Errors
-- Ensure `JWT_SECRET` is set
-- Check token expiration
-- Verify token format in requests
-
-### Email Sending Issues
-- Verify email credentials
-- Check app password for Gmail
-- Review email service logs
-
-## 📞 Support
-
-For issues or questions, please contact the development team or open an issue in the repository.
-
-
+MIT © 2025 Nagulan

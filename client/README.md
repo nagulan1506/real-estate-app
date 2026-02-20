@@ -1,205 +1,165 @@
-# NoBrokerNoCry - Frontend
+# 🏠 NoBrokerNoCry — Frontend
 
-Modern React-based frontend application for the NoBrokerNoCry real estate platform.
+> **Live Demo**: [https://storied-brigadeiros-76e5b9.netlify.app](https://storied-brigadeiros-76e5b9.netlify.app)
 
-## 🚀 Getting Started
+React + Vite frontend for **NoBrokerNoCry** — a modern real estate platform for Chennai that cuts out brokers and connects you directly with verified agents, AI insights, and a seamless Razorpay booking flow.
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| 🏘️ Property Listings | Browse, search, and filter properties by type, location & price |
+| 🗺️ Interactive Map | Leaflet-powered map view showing all listed properties |
+| ⚖️ Property Comparison | Compare up to 3 properties side-by-side |
+| ✨ AI Neighborhood Insights | Gemini-powered locality analysis on property detail pages |
+| 💳 Secure Booking | Razorpay payment integration for booking tokens (₹500) |
+| 📅 Appointment Scheduling | Book property viewings directly with agents |
+| 💬 AI Chat Assistant | Floating chat bubble powered by Gemini AI |
+| ❤️ Favorites | Save and manage favorite properties in localStorage |
+| 🔐 Auth | JWT-based login, register, forgot password, reset password |
+| 📊 Rent vs Buy Calculator | Compare the long-term cost of renting vs buying |
+| 👤 Agent Dashboard | Agents can view and manage their handled properties |
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: React 18 + Vite 5
+- **Styling**: TailwindCSS 3
+- **Routing**: React Router v6
+- **HTTP Client**: Axios
+- **Maps**: Leaflet + react-leaflet
+- **Payments**: Razorpay Checkout (loaded via CDN)
+
+---
+
+## 🚀 Local Setup
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- npm or yarn
+- Node.js ≥ 18.x
+- The **backend server** running at `http://localhost:5000`
 
-### Installation
+### Steps
 
 ```bash
+# 1. Clone this repo
+git clone https://github.com/YOUR_USERNAME/real-estate-client.git
+cd real-estate-client
+
+# 2. Install dependencies
 npm install
-```
 
-### Environment Variables
+# 3. Configure environment variables
+cp .env.example .env
+# Then edit .env with your values
 
-Create a `.env` file in the root of the `client/` directory:
-
-```env
-VITE_API_BASE=http://localhost:5000/api
-```
-
-For production, update this to your backend API URL.
-
-### Development
-
-```bash
+# 4. Start the dev server
 npm run dev
 ```
 
-The application will be available at http://localhost:5173
+The app will be available at **http://localhost:5173**
 
-### Build for Production
+---
 
-```bash
-npm run build
+## 🔑 Environment Variables
+
+Create a `.env` file in the root of this directory:
+
+```env
+# Backend API URL (no trailing slash)
+VITE_API_URL=http://localhost:5000/api
+
+# Razorpay Test Key (from your Razorpay dashboard)
+VITE_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxxxxxx
 ```
 
-The built files will be in the `dist/` directory.
+| Variable | Required | Description |
+|---|---|---|
+| `VITE_API_URL` | ✅ Yes | Base URL for the backend API |
+| `VITE_RAZORPAY_KEY_ID` | Optional | Razorpay publishable test key. Falls back to mock mode if omitted. |
 
-### Preview Production Build
+---
 
-```bash
-npm run preview
-```
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
 client/
+├── public/              # Static assets
 ├── src/
-│   ├── components/          # Reusable React components
-│   │   ├── AIChatBubble.jsx
-│   │   ├── AppointmentForm.jsx
-│   │   ├── BookProperty.jsx
-│   │   ├── ContactForm.jsx
-│   │   ├── Debug.jsx
-│   │   ├── Filters.jsx
+│   ├── assets/          # Logo image
+│   ├── components/      # Reusable UI components
+│   │   ├── BookProperty.jsx    # Razorpay payment component
+│   │   ├── PropertyCard.jsx
 │   │   ├── MapView.jsx
-│   │   ├── Modal.jsx
-│   │   └── PropertyCard.jsx
-│   ├── context/             # React Context providers
-│   │   └── Auth.jsx
-│   ├── lib/                 # Utility libraries
-│   │   └── api.js           # Axios API client
-│   ├── pages/               # Page components
+│   │   ├── Filters.jsx
+│   │   ├── ContactForm.jsx
+│   │   ├── AppointmentForm.jsx
+│   │   ├── AIChatBubble.jsx
+│   │   └── Modal.jsx
+│   ├── context/
+│   │   └── Auth.jsx     # JWT auth context
+│   ├── lib/
+│   │   └── api.js       # Axios instance
+│   ├── pages/
 │   │   ├── About.jsx
 │   │   ├── AgentDashboard.jsx
 │   │   ├── Compare.jsx
-│   │   ├── ForgotPassword.jsx
 │   │   ├── Login.jsx
 │   │   ├── Register.jsx
+│   │   ├── ForgotPassword.jsx
 │   │   └── ResetPassword.jsx
-│   ├── App.jsx              # Main application component
-│   ├── main.jsx             # Application entry point
-│   └── index.css            # Global styles
-├── public/                  # Static assets
-├── index.html               # HTML template
-├── package.json
-├── vite.config.js          # Vite configuration
-└── tailwind.config.js      # Tailwind CSS configuration
+│   ├── App.jsx          # Root component with all routes
+│   └── main.jsx
+├── index.html
+├── vite.config.js
+├── tailwind.config.js
+└── package.json
 ```
 
-## 🎨 Technologies Used
+---
 
-- **React 18**: UI library
-- **React Router**: Client-side routing
-- **Vite**: Build tool and dev server
-- **Tailwind CSS**: Utility-first CSS framework
-- **Axios**: HTTP client for API requests
-- **Leaflet**: Interactive maps
-- **React Leaflet**: React bindings for Leaflet
+## 💳 Payment Flow (Razorpay)
 
-## 🎯 Features
+1. User clicks **Book Property** on a property detail page
+2. Frontend calls `POST /api/payment/order` on the backend
+3. Backend creates a Razorpay order and returns `order_id`
+4. Frontend opens the **Razorpay Checkout modal**
+5. On payment success, frontend calls `POST /api/payment/verify` to verify the signature
+6. Backend verifies using HMAC-SHA256 and updates the booking record
 
-### User Features
-- Browse property listings with filters
-- View properties on interactive map
-- Compare up to 3 properties
-- Save favorite properties
-- AI-powered chat assistant
-- AI-generated neighborhood insights
-- User authentication (register/login)
-- Password reset functionality
-- Contact agents and schedule viewings
-- Book properties with payment integration
+> **Mock Mode**: If `VITE_RAZORPAY_KEY_ID` is not set or the backend has no Razorpay secret, mock mode activates — a "Simulate Success" button lets you test the full flow without real payments.
 
-### Agent Features
-- Agent dashboard
-- Create and manage properties
-- View inquiries
+---
 
-## 🔌 API Integration
+## 🌐 Deployment (Netlify)
 
-The frontend communicates with the backend API through the `api.js` utility. All API calls are centralized in this file.
+1. **Connect** your GitHub repo to Netlify
+2. Set **Build Command**: `npm run build`  
+3. Set **Publish Directory**: `dist`
+4. Add the **environment variables** in Netlify dashboard → Site Settings → Environment Variables
+5. Add a `netlify.toml` redirect rule for React Router SPA navigation:
 
-### API Base URL
-The API base URL is configured via the `VITE_API_BASE` environment variable. Defaults to `/api` if not set.
+```toml
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
 
-## 🎨 Styling
+---
 
-The application uses Tailwind CSS for styling. Custom configuration is in `tailwind.config.js`.
+## 📦 Available Scripts
 
-### Color Scheme
-- Primary: Sky blue (#87CEEB)
-- Background: Dark slate (gray-900)
-- Accent: Emerald green
+| Command | Description |
+|---|---|
+| `npm run dev` | Start Vite dev server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build locally |
 
-## 🧩 Key Components
-
-### PropertyCard
-Displays property information in a card format with image, title, location, price, and action buttons.
-
-### MapView
-Interactive map showing all properties with markers. Uses Leaflet for rendering.
-
-### Filters
-Advanced filtering component for properties by location, price range, type, and number of rooms.
-
-### AIChatBubble
-Floating chat bubble for AI-powered property assistance.
-
-### Modal
-Reusable modal component for forms and detailed views.
-
-## 🔐 Authentication
-
-Authentication is handled through the `Auth` context provider. The token is stored in localStorage and automatically included in API requests.
-
-## 📱 Responsive Design
-
-The application is fully responsive and works on:
-- Desktop (1920px+)
-- Laptop (1024px - 1920px)
-- Tablet (768px - 1024px)
-- Mobile (320px - 768px)
-
-## 🚀 Deployment
-
-### Netlify
-1. Build the project: `npm run build`
-2. Deploy the `dist/` directory to Netlify
-3. Configure environment variables in Netlify dashboard
-4. Set up redirects (see `public/_redirects`)
-
-### Vercel
-1. Connect your repository to Vercel
-2. Set build command: `npm run build`
-3. Set output directory: `dist`
-4. Configure environment variables
-
-### Other Platforms
-The built files in `dist/` can be deployed to any static hosting service.
-
-## 🐛 Troubleshooting
-
-### API Connection Issues
-- Verify `VITE_API_BASE` is set correctly
-- Check CORS settings on backend
-- Ensure backend server is running
-
-### Build Errors
-- Clear `node_modules` and reinstall: `rm -rf node_modules && npm install`
-- Clear Vite cache: `rm -rf node_modules/.vite`
-
-## 📝 Development Notes
-
-- The app uses React Router v6 for routing
-- State management is handled through React Context and local state
-- API calls use Axios with interceptors for authentication
-- Maps require Leaflet CSS to be imported (handled in main.jsx)
-
-## 🔄 State Management
-
-- **Global State**: Auth context for user authentication
-- **Local State**: Component-level state using React hooks
-- **Persistent State**: localStorage for favorites and compare list
+---
 
 ## 📄 License
 
-Private and proprietary.
-
-
+MIT © 2025 Nagulan
