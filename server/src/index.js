@@ -18,8 +18,23 @@ import adminRoutes from "./routes/adminRoutes.js";
 dotenv.config();
 
 const app = express();
-// CORS - allow all origins (can be restricted in production if needed)
-app.use(cors());
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "https://storied-brigadeiros-76e5b9.netlify.app",
+  "http://localhost:5173"
+].filter(Boolean);
+const corsOptions = {
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(null, true);
+  },
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use(morgan("dev"));
 
